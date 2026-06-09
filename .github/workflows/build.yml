@@ -22,16 +22,11 @@ jobs:
       run: |
         mkdir -p clang
         cd clang
-        # Инициализируем пустой Git-репозиторий
-        git init
-        git remote add origin https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86
-        
-        # Включаем режим скачивания строго определенной папки
-        git config core.sparseCheckout true
-        echo "clang-r498229b/" >> .git/info/sparse-checkout
-        
-        # Скачиваем только её из ветки master
-        git pull --depth=1 origin master
+        # Используем современный безопасный метод частичного клонирования без полной истории
+        git clone --depth=1 --filter=blob:none --no-checkout https://googlesource.com .
+        git sparse-checkout init --cone
+        git sparse-checkout set clang-r498229b
+        git checkout
         
         # Прописываем путь к бинарникам компилятора в систему
         echo "$(pwd)/clang-r498229b/bin" >> $GITHUB_PATH
