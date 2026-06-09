@@ -59,10 +59,9 @@ jobs:
         echo 'CONFIG_DEFAULT_NET_SCHED="fq"' >> $DEFCONFIG_PATH
         echo 'CONFIG_DEFAULT_TCP_CONG="bbr"' >> $DEFCONFIG_PATH
         
-        # ФОНОВЫЙ ХАК-ТАЙМЕР: Запускаем процесс в фоне. Он подождет 5 секунд (пока nova-build.sh готовит окружение)
-        # и насильно вставит заглушку прямо в вызывающий файл seninf.c прямо во время сборки.
-        (sleep 5 && echo -e "\nint imgsensor_cx_invoke_command(void *a, void *b, void *c) { return 0; }" >> drivers/misc/mediatek/imgsensor/src/common/v1_1/seninf.c) &
-        
+        # ФОНОВЫЙ ХАК-ТАЙМЕР: Добавляем ключевое слово extern для правильной линковки
+        (sleep 5 && echo -e "\nextern int imgsensor_cx_invoke_command(void *a, void *b, void *c) { return 0; }" >> drivers/misc/mediatek/imgsensor/src/common/v1_1/seninf.c) &
+
         # Делаем скрипт исполняемым и запускаем компиляцию ядра
         chmod +x nova-build.sh
         ./nova-build.sh -b
