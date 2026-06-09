@@ -35,7 +35,7 @@ jobs:
         
         # Делаем скрипт исполняемым и запускаем его
         chmod +x nova-build.sh
-        ./nova-build.sh
+        ./nova-build.sh -b
 
     - name: Upload Finished Flashable Zip
       uses: actions/upload-artifact@v4
