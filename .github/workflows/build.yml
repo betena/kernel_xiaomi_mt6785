@@ -1,7 +1,7 @@
 name: Build Nova Kernel via Script
 
 on:
-  workflow_dispatch: # Позволяет запускать сборку вручную кнопкой
+  workflow_dispatch:
 
 jobs:
   build:
@@ -18,11 +18,14 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y bc bison build-essential flex git libelf-dev libssl-dev libncurses-dev python3 libxml2-utils zip cpio
 
-    - name: Download Proton Clang Toolchain
+    - name: Download Official AOSP Clang
       run: |
         mkdir -p clang
         cd clang
-        git clone --depth=1 https://github.com/kdrag0n/proton-clang.git .
+        # Скачиваем стабильный компилятор AOSP Clang r498229b (Clang 17)
+        wget -q https://googlesource.com
+        tar -xf clang-r498229b.tar.gz
+        rm -f clang-r498229b.tar.gz
         echo "$(pwd)/bin" >> $GITHUB_PATH
 
     - name: Run Nova Build Script
@@ -33,7 +36,7 @@ jobs:
         export CROSS_COMPILE=aarch64-linux-gnu-
         export CROSS_COMPILE_ARM32=arm-linux-gnueabi-
         
-        # Делаем скрипт исполняемым и запускаем его
+        # Делаем скрипт исполняемым и запускаем его с флагом компиляции
         chmod +x nova-build.sh
         ./nova-build.sh -b
 
@@ -41,4 +44,6 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: Nova-Kernel-Flashing-Zip
-        path: AnyKernel3/*.zip
+        path: |
+          *.zip
+          AnyKernel3/*.zip
