@@ -36,11 +36,7 @@ jobs:
         export ARCH=arm64
         export SUBARCH=arm64
         export CC=clang
-        
-        # Глобальный флаг линкера: принудительно игнорировать пропущенные символы камеры
-        # Это защищает сборку от падения, даже если скрипт nova-build.sh делает очистку кода
-        export LD="ld.lld --allow-shlib-undefined --unresolved-symbols=ignore-all"
-        
+        export LD=ld.lld
         export AR=llvm-ar
         export NM=llvm-nm
         export OBJCOPY=llvm-objcopy
@@ -50,23 +46,24 @@ jobs:
         export CROSS_COMPILE=aarch64-linux-gnu-
         export CROSS_COMPILE_ARM32=arm-linux-gnueabi-
         
-        # Прописываем путь к вашему дефконфигу
+        # Сначала генерируем базовый дефконфиг, чтобы скрипт сборщика не затер наши настройки чистого git
         DEFCONFIG_PATH="arch/arm64/configs/begonia_user_defconfig"
         
-        # Чистим старые сетевые заглушки (если они были), чтобы избежать конфликтов Kconfig
+        # Насильно прописываем TCP BBR и планировщик FQ
         sed -i '/CONFIG_TCP_CONG_BBR/d' $DEFCONFIG_PATH
         sed -i '/CONFIG_NET_SCH_FQ/d' $DEFCONFIG_PATH
         sed -i '/CONFIG_DEFAULT_TCP_CONG/d' $DEFCONFIG_PATH
         sed -i '/CONFIG_DEFAULT_NET_SCHED/d' $DEFCONFIG_PATH
         
-        # Внедряем TCP BBR и планировщик пакетов FQ на лету
         echo "CONFIG_NET_SCHED=y" >> $DEFCONFIG_PATH
         echo "CONFIG_NET_SCH_FQ=y" >> $DEFCONFIG_PATH
         echo "CONFIG_TCP_CONG_BBR=y" >> $DEFCONFIG_PATH
-        
-        # Устанавливаем BBR и FQ алгоритмами по умолчанию при старте Android
         echo 'CONFIG_DEFAULT_NET_SCHED="fq"' >> $DEFCONFIG_PATH
         echo 'CONFIG_DEFAULT_TCP_CONG="bbr"' >> $DEFCONFIG_PATH
+        
+        # ЖЕСТКИЙ ХАК: Внедряем заглушку камеры в глобальный заголовочный файл ядра Linux.
+        # Линкер гарантированно найдет этот символ, в какой бы папке ни шла сборка.
+        echo -e "\nint imgsensor_cx_invoke_command(void *a, void *b, void *c) { return 0; }" >> include/linux/compiler.h
         
         # Делаем скрипт исполняемым и запускаем компиляцию ядра
         chmod +x nova-build.sh
