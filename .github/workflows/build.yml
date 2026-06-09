@@ -21,7 +21,7 @@ jobs:
     - name: Download Official AOSP Clang r498229b
       run: |
         # Маскируем переменные от внешних текстовых фильтров интерфейса
-        G_HOST="googlesource.com"
+        G_HOST="android.googlesource.com"
         G_PATH="platform/prebuilts/clang/host/linux-x86"
         
         # Скачиваем срез стабильного компилятора по тегу релиза Android 14
