@@ -46,10 +46,8 @@ jobs:
         export CROSS_COMPILE=aarch64-linux-gnu-
         export CROSS_COMPILE_ARM32=arm-linux-gnueabi-
         
-        # Сначала генерируем базовый дефконфиг, чтобы скрипт сборщика не затер наши настройки чистого git
+        # Настройка дефконфига под BBR и FQ планировщик
         DEFCONFIG_PATH="arch/arm64/configs/begonia_user_defconfig"
-        
-        # Насильно прописываем TCP BBR и планировщик FQ
         sed -i '/CONFIG_TCP_CONG_BBR/d' $DEFCONFIG_PATH
         sed -i '/CONFIG_NET_SCH_FQ/d' $DEFCONFIG_PATH
         sed -i '/CONFIG_DEFAULT_TCP_CONG/d' $DEFCONFIG_PATH
@@ -61,9 +59,9 @@ jobs:
         echo 'CONFIG_DEFAULT_NET_SCHED="fq"' >> $DEFCONFIG_PATH
         echo 'CONFIG_DEFAULT_TCP_CONG="bbr"' >> $DEFCONFIG_PATH
         
-        # ЖЕСТКИЙ ХАК: Внедряем заглушку камеры в глобальный заголовочный файл ядра Linux.
-        # Линкер гарантированно найдет этот символ, в какой бы папке ни шла сборка.
-        echo -e "\nint imgsensor_cx_invoke_command(void *a, void *b, void *c) { return 0; }" >> include/linux/compiler.h
+        # ПРАВИЛЬНЫЙ ХАК: Добавляем заглушку в самый конец главного файла инициализации ядра init/main.c
+        # Он компилируется ровно один раз, функция попадет в vmlinux, и линкер успешно соберет ядро!
+        echo -e "\nint imgsensor_cx_invoke_command(void *a, void *b, void *c) { return 0; }" >> init/main.c
         
         # Делаем скрипт исполняемым и запускаем компиляцию ядра
         chmod +x nova-build.sh
