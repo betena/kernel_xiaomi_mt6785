@@ -18,15 +18,23 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y bc bison build-essential flex git libelf-dev libssl-dev libncurses-dev python3 libxml2-utils zip cpio
 
-    - name: Download Official AOSP Clang
+    - name: Download Official AOSP Clang r498229b
       run: |
         mkdir -p clang
         cd clang
-        # Скачиваем стабильный компилятор AOSP Clang r498229b (Clang 17)
-        wget -q https://googlesource.com
-        tar -xf clang-r498229b.tar.gz
-        rm -f clang-r498229b.tar.gz
-        echo "$(pwd)/bin" >> $GITHUB_PATH
+        # Инициализируем пустой Git-репозиторий
+        git init
+        git remote add origin https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86
+        
+        # Включаем режим скачивания строго определенной папки
+        git config core.sparseCheckout true
+        echo "clang-r498229b/" >> .git/info/sparse-checkout
+        
+        # Скачиваем только её из ветки master
+        git pull --depth=1 origin master
+        
+        # Прописываем путь к бинарникам компилятора в систему
+        echo "$(pwd)/clang-r498229b/bin" >> $GITHUB_PATH
 
     - name: Run Nova Build Script
       run: |
