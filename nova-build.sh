@@ -20,7 +20,7 @@ export USE_HOST_LEX=yes
 install_tools() {
     mkdir -p "$TOOLCHAIN_DIR" && cd "$TOOLCHAIN_DIR"
     curl -LO "https://raw.githubusercontent.com/Neutron-Toolchains/antman/main/antman"
-    chmod +x antman && ./antman -S
+    chmod +x antman && ./antman -S --release
     cd "$KERNEL_PATH"
 }
 
