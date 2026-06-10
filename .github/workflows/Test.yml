@@ -24,10 +24,10 @@ jobs:
         #patchelf git-lfs ripgrep clang-11
 
     - name: Download Neutron Toolchain
-      run: bash build.sh --tools
+      run: bash ./nova-build.sh --tools
 
     - name: Build Nova
-      run: bash build.sh --build
+      run: bash ./nova-build.sh --build
 
     - name: Upload Finished Flashable Zip
       uses: actions/upload-artifact@v4
