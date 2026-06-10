@@ -37,7 +37,7 @@ jobs:
         # Делаем скрипт исполняемым и запускаем компиляцию ядра
         chmod +x nova-build.sh
         # Запускаем скрипт через bash с флагом -x для построчного вывода команд в лог GitHub Actions
-        bash -x ./nova-build.sh -b || true
+        bash -x ./nova-build.sh -b stock_defconfig || true
         if [ -f "out/error.log" ]; then
           echo "=== КРИТИЧЕСКИЙ ЛОГ ОШИБОК КОМПИЛЯЦИИ (out/error.log) ==="
           cat out/error.log
