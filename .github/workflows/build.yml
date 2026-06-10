@@ -12,7 +12,8 @@ jobs:
       with:
         ref: fifteen-fixed-ksu
         fetch-depth: 1
-
+    - name: Update Environment
+      run: #sudo apt update -y && sudo apt upgrade -y
     - name: Install Build Dependencies
       run: |
         sudo apt-get update
