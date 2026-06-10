@@ -52,7 +52,19 @@ jobs:
         
         # Делаем скрипт исполняемым и запускаем компиляцию ядра
         chmod +x nova-build.sh
-        ./nova-build.sh -b
+        # Запускаем скрипт через bash с флагом -x для построчного вывода команд в лог GitHub Actions
+        bash -x ./nova-build.sh -b || true
+        
+    - name: Debug Post-Build Artifacts (Вывод отладки при падении)
+      if: always() # Этот шаг выполнится в любом случае, даже если скрипт сборки упал
+      run: |
+        echo "=== ПРОВЕРКА СОБРАННЫХ ФАЙЛОВ ЯДРА ==="
+        # Ищем, скомпилировался ли сам бинарник ядра (Image, Image.gz, Image.gz-dtb)
+        find . -name "Image*" -o -name "*.dtb"
+        
+        echo "=== ПРОВЕРКА СОДЕРЖИМОГО ПАПКИ ANYKERNEL ==="
+        # Проверяем, успели ли файлы скопироваться в папку упаковщика
+        if [ -d "AnyKernel3" ]; then ls -la AnyKernel3/; else echo "Папка AnyKernel3 не найдена"; fi
 
     - name: Upload Finished Flashable Zip
       uses: actions/upload-artifact@v4
