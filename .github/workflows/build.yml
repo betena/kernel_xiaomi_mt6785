@@ -45,7 +45,7 @@ jobs:
         sed -i '/CONFIG_DEFAULT_NET_SCHED/d' $DEFCONFIG_PATH
         
         echo "CONFIG_NET_SCHED=y" >> $DEFCONFIG_PATH
-        echo "CONFIG_NET_SCH_FQ=y" >> $EFFCONFIG_PATH
+        echo "CONFIG_NET_SCH_FQ=y" >> $DEFCONFIG_PATH
         echo "CONFIG_TCP_CONG_BBR=y" >> $DEFCONFIG_PATH
         echo 'CONFIG_DEFAULT_NET_SCHED="fq"' >> $DEFCONFIG_PATH
         echo 'CONFIG_DEFAULT_TCP_CONG="bbr"' >> $DEFCONFIG_PATH
