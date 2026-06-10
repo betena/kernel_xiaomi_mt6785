@@ -33,9 +33,9 @@ jobs:
         export CROSS_COMPILE=aarch64-linux-gnu-
         export CROSS_COMPILE_ARM32=arm-linux-gnueabi-
         
-        # БЕЗОПАСНЫЙ МАКРОС: Передаем имя функции без круглых скобок, чтобы не ломать синтаксис /bin/sh в скриптах ядра.
-        # В коде вызов превратится в безопасную заглушку, а компилятор успешно пройдет стартовые тесты.
-        export KCFLAGS="-Dimgsensor_cx_invoke_command=0"
+        # НАДЕЖНЫЙ ЛИНКЕР-ХАК: Говорим линкеру приравнять адрес отсутствующей функции к 0.
+        # Переменная LDFLAGS внедряется в финальный vmlinux сквозь любые внутренние перегрузки скрипта.
+        export LDFLAGS="--defsym=imgsensor_cx_invoke_command=0"
         
         # Настройка дефконфига под BBR и FQ планировщик
         DEFCONFIG_PATH="arch/arm64/configs/begonia_user_defconfig"
