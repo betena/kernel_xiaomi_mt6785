@@ -33,7 +33,7 @@ build_kernel() {
     [[ ! -d "$TOOLCHAIN_DIR/bin" ]] && install_tools
     mkdir -p "$OUT_DIR"
     make O="$OUT_DIR" CROSS_COMPILE=aarch64-linux-gnu- LLVM=1 "$DEFCONFIG"
-    exec 2> >(tee -a "$OUT_DIR/error.log" >&2)
+    #exec 2> >(tee -a "$OUT_DIR/error.log" >&2)
     make -j"$(nproc)" \
         O="$OUT_DIR" \
         CC=clang LLVM=1 LLVM_IAS=1 \
