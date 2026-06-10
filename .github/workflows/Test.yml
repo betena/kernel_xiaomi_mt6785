@@ -29,8 +29,32 @@ jobs:
     - name: Build Nova
       run: bash build.sh --build
 
-    - name: Upload kernel
-      uses: actions/upload-artifact@v3
+    - name: Upload Finished Flashable Zip
+      uses: actions/upload-artifact@v4
       with:
-        name: NoVA-Begonia
-        path: NoVA-Begonia-4.14.*.zip
+        name: Nova-Kernel-Flashing-Zip
+        path: |
+          *.zip
+          AnyKernel3/*.zip
+
+    - name: Prepare and Upload Kernel Headers Kit
+      run: |
+        # Создаем папку для сохранения среды разработки драйверов/модулей
+        mkdir -p kernel-dev-kit
+        
+        # Копируем сгенерированные файлы символов функций и текущий рабочий конфиг
+        cp System.map Module.symvers .config kernel-dev-kit/ 2>/dev/null || true
+        
+        # Копируем структуру заголовочных файлов и бинарных скриптов сборщика
+        cp -r --parents include/ kernel-dev-kit/ 2>/dev/null || true
+        cp -r --parents arch/arm64/include/ kernel-dev-kit/ 2>/dev/null || true
+        cp -r --parents scripts/ kernel-dev-kit/ 2>/dev/null || true
+        
+        # Запаковываем всё в компактный ZIP-архив
+        zip -r Nova-Kernel-Headers.zip kernel-dev-kit/
+
+    - name: Upload Kernel Headers Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: Nova-Kernel-Development-Headers
+        path: Nova-Kernel-Headers.zip
